@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "node-fetch": "^3.3.2"
+  },
+  "name": "where-are-you-kamil",
+  "version": "1.0.0",
+  "description": "[![WHERE ARE YOU KAMIL](https://img.youtube.com/vi/ZJlf4xMq5g8/0.jpg)](https://www.youtube.com/watch?v=ZJlF4xMq5g8)",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/celeseyana/where-are-you-kamil.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/celeseyana/where-are-you-kamil/issues"
+  },
+  "homepage": "https://github.com/celeseyana/where-are-you-kamil#readme"
+}
