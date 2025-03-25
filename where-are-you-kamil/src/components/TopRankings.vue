@@ -11,8 +11,8 @@
             <div class="user-icon"></div>
             
             <div class="user-name-desc">
-                <span class="username">{{ player.name }}</span>
-                <span class="userDesc">{{ player.introduction }}</span>
+                <span class="username" v-html="formatText(player.name)"></span>
+                <span class="userDesc" v-html="formatText(player.introduction)"></span>
             </div>
             
             <div class="user-rank-id-pts">
@@ -26,6 +26,7 @@
 
 <script lang="ts">
 import { Vue } from 'vue-class-component';
+import DOMPurify from 'dompurify';
 
 interface PlayerData {
     uid: number;
@@ -38,6 +39,25 @@ interface PlayerData {
 export default class TopRankings extends Vue {
     private players: PlayerData[] = [];
     private isLoading = true;
+
+    private formatText(text: string): string {
+        if (!text) return '';
+        
+        let formatted = text
+            .replace(/\[C\]/g, '')
+            .replace(/\[([a-f0-9]{6})\]/gi, '<span style="color: #$1">')
+            .replace(/\[b\]/g, '<strong>').replace(/\[\/b\]/g, '</strong>')
+            .replace(/\[c\]/g, '<span style="display: inline-block; text-align: center">')
+            .replace(/\[\/c\]/g, '</span>')
+            .replace(/\[sup\]/g, '<sup>').replace(/\[\/sup\]/g, '</sup>')
+            .replace(/\[sub\]/g, '<sub>').replace(/\[\/sub\]/g, '</sub>')
+            .replace(/\[\/([a-z]+)\]?/gi, '</$1>');
+
+        return DOMPurify.sanitize(formatted, {
+            ALLOWED_TAGS: ['span', 'strong', 'sup', 'sub'],
+            ALLOWED_ATTR: ['style']
+        });
+    }
 
     private async fetchLeaderboardData() {
         try {
@@ -115,5 +135,33 @@ export default class TopRankings extends Vue {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+    }
+
+    .username,
+    .userDesc {
+        line-height: 1.3;
+    }
+
+    .username strong, 
+    .userDesc strong {
+        font-weight: bold;
+    }
+
+    .username sup, 
+    .userDesc sup {
+        vertical-align: super;
+        font-size: 0.8em;
+    }
+
+    .username sub, 
+    .userDesc sub {
+        vertical-align: sub;
+        font-size: 0.8em;
+    }
+
+    .username [style*="text-align: center"], 
+    .userDesc [style*="text-align: center"] {
+        display: block;
+        text-align: center;
     }
 </style>
