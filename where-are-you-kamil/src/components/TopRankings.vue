@@ -8,8 +8,10 @@
                 <span v-else>#{{ index + 1 }}</span>
             </div>
             
-            <div class="user-icon"></div>
-            
+            <div class="user-icon">
+                <img v-if="player.iconUrl" :src="player.iconUrl" alt="User icon" />
+            </div>
+
             <div class="user-name-desc">
                 <span class="username" v-html="formatText(player.name)"></span>
                 <span class="userDesc" v-html="formatText(player.introduction)"></span>
@@ -34,6 +36,7 @@ interface PlayerData {
     introduction: string;
     rank: number;
     points: number;
+    iconUrl?: string;
 }
 
 export default class TopRankings extends Vue {
@@ -59,21 +62,39 @@ export default class TopRankings extends Vue {
         });
     }
 
+    private async fetchUserIcon(uid: number): Promise<string> {
+        try {
+            const response = await fetch(`http://localhost:3000/api/user-icon/${uid}`);
+            const data = await response.json();
+            return data.iconUrl || '';
+        } catch (error) {
+            console.error('Error fetching icon:', error);
+            return '';
+        }
+    }
+
     private async fetchLeaderboardData() {
         try {
             const response = await fetch('http://localhost:3000/api/leaderboard');
             const data = await response.json();
             
-            this.players = data.points.map((point: any) => {
+            // process t10
+            const topPlayers = data.points.slice(0, 10).map(async (point: any) => {
                 const user = data.users.find((u: any) => u.uid === point.uid);
+                const iconUrl = await this.fetchUserIcon(point.uid);
+                
                 return {
                     uid: point.uid,
                     name: user?.name || 'Unknown',
                     introduction: user?.introduction || '',
                     rank: user?.rank || 0,
-                    points: point.value
+                    points: point.value,
+                    iconUrl
                 };
-            }).slice(0, 10);
+            });
+            
+            // wait for icons load
+            this.players = await Promise.all(topPlayers);
             
         } catch (error) {
             console.error(error);
@@ -114,6 +135,11 @@ export default class TopRankings extends Vue {
         border-radius: 10px;
         background-color: aliceblue; /* Placeholder */
         flex-shrink: 0;
+    }
+
+    .user-icon img {
+        width: 64px;
+        height: 64px;
     }
 
     .t10-leaderboard-container {
@@ -165,3 +191,31 @@ export default class TopRankings extends Vue {
         text-align: center;
     }
 </style>
+
+<!-- https://bestdori.com/assets/en/thumb/chara/card00002_rip/res017005_normal.png (t1 example)
+
+https://bestdori.com/assets/en/thumb/chara/card{formattedCardResourceId}_rip/{iconResourceSetName}_{iconStatus}.png
+
+for cardResourceId,
+get the sid from http://localhost:3000/api/leaderboard, assume t1,
+let userSid = response.users.[0].sid
+then,
+resolve https://bestdori.com/api/cards/{userSid}.json
+then, let iconResourceSetName = response.resourceSetName
+and
+let cardResourceId = response.episodes.entries.[0].costs.entries.[0].resourceId
+let formattedCardResourceId = String(cardResourceId).padStart(5, '0')
+
+resolve http://localhost:3000/api/leaderboard
+then 
+let playerUid = response.users.[0].uid
+
+resolve https://bestdori.com/api/player/en/{playerUid}?mode=2
+then
+let iconStatus = response.data.profile.userProfileSituation.illust
+
+after all data is gotten
+
+fetch https://bestdori.com/assets/en/thumb/chara/card{formattedCardResourceId}_rip/{iconResourceSetName}_{iconStatus}.png
+then dynamically set as icon for each "player" row  -->
+

@@ -2,16 +2,27 @@
     <div class="ep-container">
         <div class="data-fields">
             <div class="indv-fields">
-                <span>Points per song*</span>
+                <span>Points per song</span>
                 <input v-model="pointsPerSong" placeholder="Points per song" class="input-field-ep"/>
             </div>
             
             <div class="indv-fields">
-                <span>Current EP*</span>
+                <span>Current EP</span>
                 <input v-model="currentEventPoints" placeholder="Current event points" class="input-field-ep"/>
             </div>
         </div>
+        <div id="selector-header">Event Type {{ selected }}</div>
+        <select class="evt-selector" v-model="selected">
+            <option>Normal</option>
+            <option>Challenge Live</option>
+            <option>VS Live</option>
+            <option>Live Goals</option>
+            <option>Mission Live</option>
+            <option>Team Live Festival</option>
+            <option>Medley Live</option>
+        </select>
         <button>Submit</button>
+        <!-- needs a separate field if CL -->
     </div>
 </template>
 
@@ -58,5 +69,13 @@
     .input-field-ep {
         margin-left: 0;
         text-align: center;
+    }
+
+    #selector-header {
+        margin-bottom: 10px;
+    }
+
+    .evt-selector {
+        margin-bottom: 10px;
     }
 </style>
