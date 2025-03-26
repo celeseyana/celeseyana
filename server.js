@@ -28,15 +28,21 @@ app.get('/api/user-icon/:uid', async (req, res) => {
         const leaderboardResponse = await fetch('https://bestdori.com/api/eventtop/data?server=1&event=257&mid=0&latest=1');
         const leaderboardData = await leaderboardResponse.json();
         const user = leaderboardData.users.find(u => u.uid === parseInt(uid));
+
         const sid = user?.sid;
-        
+        // console.log("sid: ", sid); // sid isnt arranged
+
         if (!sid) throw new Error('SID not found');
         
         const cardResponse = await fetch(`https://bestdori.com/api/cards/${sid}.json`);
         const cardData = await cardResponse.json();
         const iconResourceSetName = cardData.resourceSetName;
-        const cardResourceId = cardData.episodes.entries[0].costs.entries[0].resourceId;
-        const formattedCardResourceId = String(cardResourceId).padStart(5, '0');
+
+        // const cardResourceId = cardData.episodes.entries[0].costs.entries[0].resourceId;
+
+        const calcCardResourceId = Math.floor(sid);
+        const formattedCardResourceId = String(calcCardResourceId).padStart(5, '0');
+        console.log("formatted icon id: ",formattedCardResourceId)
         
         // Construct final URL
         const iconUrl = `https://bestdori.com/assets/en/thumb/chara/card${formattedCardResourceId}_rip/${iconResourceSetName}_${iconStatus}.png`;
