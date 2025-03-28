@@ -26,10 +26,20 @@
     </div>
 </template>
 
-<script>
-    export default {
-        name: 'EventPoints', 
-    };
+<script lang="ts">
+import { Vue } from 'vue-class-component';
+
+export default class EventPoints extends Vue {
+    data() {
+        return {
+            selected: 'Normal'
+        }
+    }
+
+    private async standardPointsCalculator() {
+        
+    }
+};
 </script>
 
 <style>

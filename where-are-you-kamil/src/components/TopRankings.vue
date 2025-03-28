@@ -1,26 +1,33 @@
 <template>
     <div class="t10-leaderboard-container">
-        <div v-for="(player, index) in players" :key="player.uid" 
-             class="leaderboard-row" :id="'rank-' + (index + 1)">
-            
-            <div class="event-rank">
-                <img v-if="index < 3" :src="'/en_' + (index + 1) + '.png'" />
-                <span v-else>#{{ index + 1 }}</span>
-            </div>
-            
-            <div class="user-icon">
-                <img v-if="player.iconUrl" :src="player.iconUrl" alt="User icon" />
-            </div>
+        <div v-for="(player, index) in players" :key="player.uid" class="leaderboard-row-container">
+            <div class="leaderboard-row" :id="'rank-' + (index + 1)">
+                <div class="event-rank">
+                    <img v-if="index < 3" :src="'/en_' + (index + 1) + '.png'" />
+                    <span v-else>#{{ index + 1 }}</span>
+                </div>
+                
+                <div class="user-icon">
+                    <img v-if="player.iconUrl" :src="player.iconUrl" alt="User icon" />
+                </div>
 
-            <div class="user-name-desc">
-                <span class="username" v-html="formatText(player.name)"></span>
-                <span class="userDesc" v-html="formatText(player.introduction)"></span>
+                <div class="user-name-desc">
+                    <span class="username" v-html="formatText(player.name)"></span>
+                    <span class="userDesc" v-html="formatText(player.introduction)"></span>
+                </div>
+                
+                <div class="user-rank-id-pts">
+                    <span class="userRank">Rank {{ player.rank }}</span>
+                    <span class="userId">#{{ player.uid }}</span>
+                    <span class="userPts">{{ player.points.toLocaleString() }} Pts</span>
+                </div>
             </div>
             
-            <div class="user-rank-id-pts">
-                <span class="userRank">Rank {{ player.rank }}</span>
-                <span class="userId">#{{ player.uid }}</span>
-                <span class="userPts">{{ player.points.toLocaleString() }} Pts</span>
+            <div class="data-box">
+                <span>Differential (vs 1h ago)</span>
+                <span class="differential-pts" v-if="differencesCalculated && differences.length > index && differences[index] !== undefined">
+                    +{{ differences[index].toLocaleString() }} Points
+                </span>
             </div>
         </div>
     </div>
@@ -39,9 +46,16 @@ interface PlayerData {
     iconUrl?: string;
 }
 
+interface IntervalPlayerData {
+    uid: number;
+    points: number;
+}
+
 export default class TopRankings extends Vue {
     private players: PlayerData[] = [];
+    private filteredPlayers: IntervalPlayerData[] = [];
     private isLoading = true;
+    private differencesCalculated = false;
 
     private formatText(text: string): string {
         if (!text) return '';
@@ -82,7 +96,7 @@ export default class TopRankings extends Vue {
             const topPlayers = data.points.slice(0, 10).map(async (point: any) => {
                 const user = data.users.find((u: any) => u.uid === point.uid);
                 const iconUrl = await this.fetchUserIcon(point.uid);
-                
+
                 return {
                     uid: point.uid,
                     name: user?.name || 'Unknown',
@@ -95,6 +109,8 @@ export default class TopRankings extends Vue {
             
             // wait for icons load
             this.players = await Promise.all(topPlayers);
+
+            // console.log("Fetched leaderboard data:", this.players);
             
         } catch (error) {
             console.error(error);
@@ -103,8 +119,36 @@ export default class TopRankings extends Vue {
         }
     }
 
-    mounted(): void {
-        this.fetchLeaderboardData();
+    private async fetchIntervalData() {
+        try {
+            const response = await fetch('http://localhost:3000/api/intervaldata');
+            const data = await response.json();
+            data.points.splice(-10, 10); 
+            
+            this.filteredPlayers = data.points.slice(-10).map((point: any) => ({
+                uid: point.uid,
+                points: point.value
+            }));
+            
+            // console.log("Data 1hr ago: ", this.filteredPlayers);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    get differences(): number[] {
+        return this.players.map((player, index) => 
+            player.points - (this.filteredPlayers[index]?.points || 0)
+        );
+    }
+
+    async mounted(): Promise<void> {
+        await this.fetchLeaderboardData();
+        await this.fetchIntervalData();
+
+        this.differencesCalculated = true;
     }
 }
 </script>
@@ -133,7 +177,7 @@ export default class TopRankings extends Vue {
         width: 64px;
         height: 64px;
         border-radius: 10px;
-        background-color: aliceblue; /* Placeholder */
+        background-color: aliceblue;
         flex-shrink: 0;
     }
 
@@ -190,32 +234,27 @@ export default class TopRankings extends Vue {
         display: block;
         text-align: center;
     }
+
+    .leaderboard-row-container {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .data-box {
+        width: 150px;
+        height: 70px;
+        background-color: rgba(245, 245, 245, 0.4);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .differential-pts {
+        color: greenyellow;
+        display: flex;
+    }
 </style>
-
-<!-- https://bestdori.com/assets/en/thumb/chara/card00002_rip/res017005_normal.png (t1 example)
-
-https://bestdori.com/assets/en/thumb/chara/card{formattedCardResourceId}_rip/{iconResourceSetName}_{iconStatus}.png
-
-for cardResourceId,
-get the sid from http://localhost:3000/api/leaderboard, assume t1,
-let userSid = response.users.[0].sid
-then,
-resolve https://bestdori.com/api/cards/{userSid}.json
-then, let iconResourceSetName = response.resourceSetName
-and
-let cardResourceId = response.episodes.entries.[0].costs.entries.[0].resourceId
-let formattedCardResourceId = String(cardResourceId).padStart(5, '0')
-
-resolve http://localhost:3000/api/leaderboard
-then 
-let playerUid = response.users.[0].uid
-
-resolve https://bestdori.com/api/player/en/{playerUid}?mode=2
-then
-let iconStatus = response.data.profile.userProfileSituation.illust
-
-after all data is gotten
-
-fetch https://bestdori.com/assets/en/thumb/chara/card{formattedCardResourceId}_rip/{iconResourceSetName}_{iconStatus}.png
-then dynamically set as icon for each "player" row  -->
-

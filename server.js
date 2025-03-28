@@ -15,6 +15,16 @@ app.get('/api/leaderboard', async (req, res) => {
     }
 });
 
+app.get('/api/intervaldata', async (req, res) => {
+    try {
+        const intervalResponse = await fetch('https://bestdori.com/api/eventtop/data?server=1&event=257&mode=1&interval=3600000');
+        const intervalData = await intervalResponse.json();
+        res.json(intervalData);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch data intervals' });
+    }
+});
+
 app.get('/api/user-icon/:uid', async (req, res) => {
     try {
         const { uid } = req.params;
@@ -30,7 +40,6 @@ app.get('/api/user-icon/:uid', async (req, res) => {
         const user = leaderboardData.users.find(u => u.uid === parseInt(uid));
 
         const sid = user?.sid;
-        // console.log("sid: ", sid); // sid isnt arranged
 
         if (!sid) throw new Error('SID not found');
         
@@ -38,11 +47,9 @@ app.get('/api/user-icon/:uid', async (req, res) => {
         const cardData = await cardResponse.json();
         const iconResourceSetName = cardData.resourceSetName;
 
-        // const cardResourceId = cardData.episodes.entries[0].costs.entries[0].resourceId;
 
-        const calcCardResourceId = Math.floor(sid);
+        const calcCardResourceId = Math.floor(sid / 50);
         const formattedCardResourceId = String(calcCardResourceId).padStart(5, '0');
-        console.log("formatted icon id: ",formattedCardResourceId)
         
         // Construct final URL
         const iconUrl = `https://bestdori.com/assets/en/thumb/chara/card${formattedCardResourceId}_rip/${iconResourceSetName}_${iconStatus}.png`;
