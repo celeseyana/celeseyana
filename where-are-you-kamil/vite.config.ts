@@ -7,14 +7,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://where-are-you-kamil.vercel.app',
         changeOrigin: true,
-        secure: false,
-        rewrite: path => path.replace(/^\/api/, '')
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
-  },
-  build: {
-    outDir: 'dist'
   }
 })

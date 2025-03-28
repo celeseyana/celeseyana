@@ -78,24 +78,43 @@ export default class TopRankings extends Vue {
         });
     }
 
+    private readonly API_BASE = import.meta.env.DEV 
+    ? '/api' 
+    : 'https://where-are-you-kamil.vercel.app/api';
+
     private async fetchUserIcon(uid: number): Promise<string> {
         try {
-            const response = await fetch(`http://localhost:3000/api/user-icon/${uid}`);
+            const response = await fetch(`${this.API_BASE}/user-icon/${uid}`);
+            if (!response.ok) throw new Error('Failed to fetch icon');
             const data = await response.json();
-            return data.iconUrl || '';
+            return data.iconUrl || this.getFallbackIconUrl();
         } catch (error) {
             console.error('Error fetching icon:', error);
-            return '';
+            return this.getFallbackIconUrl();
         }
     }
 
+    private getFallbackIconUrl(): string {
+        return 'https://bestdori.com/assets/en/thumb/chara/card00000_rip/default_normal.png';
+    }
+
     private async fetchLeaderboardData() {
+        this.isLoading = true;
         try {
-            const response = await fetch('http://localhost:3000/api/leaderboard');
-            const data = await response.json();
+            console.log('Fetching leaderboard from:', `${this.API_BASE}/leaderboard`);
+            const response = await fetch(`${this.API_BASE}/leaderboard`);
             
-            // process t10
-            const topPlayers = data.points.slice(0, 10).map(async (point: any) => {
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(
+                    `HTTP ${response.status}: ${errorData.message || 'Failed to fetch leaderboard'}`
+                );
+            }
+
+            const data = await response.json();
+            console.log('Leaderboard raw data:', data);
+            
+            const topPlayersPromises = data.points.slice(0, 10).map(async (point: any) => {
                 const user = data.users.find((u: any) => u.uid === point.uid);
                 const iconUrl = await this.fetchUserIcon(point.uid);
 
@@ -109,38 +128,48 @@ export default class TopRankings extends Vue {
                 };
             });
             
-            // wait for icons load
-            this.players = await Promise.all(topPlayers);
-
-            // console.log("Fetched leaderboard data:", this.players);
-            
+            this.players = await Promise.all(topPlayersPromises);
+            console.log('Processed players:', this.players);
         } catch (error) {
-            console.error(error);
+            console.error('Leaderboard fetch error:', error);
         } finally {
             this.isLoading = false;
         }
     }
 
     private async fetchIntervalData() {
+        this.isLoading = true;
         try {
-            const response = await fetch('http://localhost:3000/api/intervaldata');
-            const data = await response.json();
-            data.points.splice(-10, 10); 
+            console.log('Fetching interval data from:', `${this.API_BASE}/intervaldata`);
+            const response = await fetch(`${this.API_BASE}/intervaldata`);
             
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(
+                    `HTTP ${response.status}: ${errorData.message || 'Failed to fetch interval data'}`
+                );
+            }
+
+            const data = await response.json();
+            console.log('Interval raw data:', data);
+            
+            data.points.splice(-10, 10); 
             this.filteredPlayers = data.points.slice(-10).map((point: any) => ({
                 uid: point.uid,
                 points: point.value
             }));
-            
-            // console.log("Data 1hr ago: ", this.filteredPlayers);
+            console.log('Processed interval data:', this.filteredPlayers);
         } catch (error) {
-            console.error(error);
+            console.error('Interval data fetch error:', error);
         } finally {
             this.isLoading = false;
         }
     }
 
     get differences(): number[] {
+        if (!this.players.length || !this.filteredPlayers.length) {
+            return [];
+        }
         return this.players.map((player, index) => 
             player.points - (this.filteredPlayers[index]?.points || 0)
         );

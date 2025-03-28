@@ -1,31 +1,13 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist",
-        "cleanDistDir": true
-      }
-    },
-    {
-      "src": "server.js",
-      "use": "@vercel/node"
-    }
+    { "src": "package.json", "use": "@vercel/static-build" },
+    { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
-    {
-        "src": "/api/.*",
-        "dest": "server.js",
-        "headers": {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, OPTIONS"
-        }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+    { "src": "/api/leaderboard", "dest": "/api/leaderboard" },
+    { "src": "/api/intervaldata", "dest": "/api/intervaldata" },
+    { "src": "/api/user-icon/(?<uid>[^/]+)", "dest": "/api/user-icon/[uid].js?uid=$uid" },
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }
