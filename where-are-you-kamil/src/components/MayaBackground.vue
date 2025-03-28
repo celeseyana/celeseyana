@@ -5,10 +5,12 @@
     </div>
 </template>
 
-<script>
-    export default {
-        name: 'MayaBackground', 
-    };
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+    name: 'MayaBackground'
+})
 </script>
 
 <style>

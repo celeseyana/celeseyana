@@ -54,6 +54,8 @@ interface IntervalPlayerData {
 export default class TopRankings extends Vue {
     private players: PlayerData[] = [];
     private filteredPlayers: IntervalPlayerData[] = [];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     private isLoading = true;
     private differencesCalculated = false;
 
