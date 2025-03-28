@@ -33,6 +33,9 @@
   },
   "devDependencies": {
     "@mdi/font": "^7.4.47",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "@types/node-fetch": "^2.6.12",
     "@vercel/node": "^2.3.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
