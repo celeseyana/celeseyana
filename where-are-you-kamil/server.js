@@ -15,7 +15,6 @@ const corsOptions = {
     'https://*.vercel.app' // All Vercel deployments
   ],
   methods: ['GET', 'OPTIONS'],
-  credentials: true
 };
 
 app.use(cors(corsOptions));
