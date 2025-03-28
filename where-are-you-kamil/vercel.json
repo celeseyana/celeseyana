@@ -2,23 +2,19 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/server.js",
+      "src": "server.js",
       "use": "@vercel/node"
     },
     {
-      "src": "vite.config.js",
-      "use": "@vitejs/plugin-react",
+      "src": "vite.config.ts",
+      "use": "@vitejs/plugin-vue",
       "config": {}
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "dist/$1"
-    }
-  ]
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/"
+        }
+    ]
 }
