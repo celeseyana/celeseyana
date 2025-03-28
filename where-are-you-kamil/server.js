@@ -8,7 +8,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',
+    'https://where-are-you-kamil.vercel.app',
+    'https://*.vercel.app' // All Vercel deployments
+  ],
+  methods: ['GET', 'OPTIONS'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.get('/api/leaderboard', async (req, res) => {
     try {
@@ -74,9 +85,9 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
-export default app;
-
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
+
+export default app;
