@@ -1,6 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import fetch from 'node-fetch';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
@@ -61,14 +66,17 @@ app.get('/api/user-icon/:uid', async (req, res) => {
     }
 });
 
-app.listen(3000, () => console.log('listening...'));
-
 if (process.env.NODE_ENV === 'production') {
-    app.use(express.static('dist'));
-
+    app.use(express.static(path.join(__dirname, 'dist')));
+    
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     });
 }
 
-module.exports = app;
+export default app;
+
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
