@@ -6,7 +6,7 @@
                     <img v-if="index < 3" :src="'/en_' + (index + 1) + '.png'" />
                     <span v-else>#{{ index + 1 }}</span>
                 </div>
-                
+
                 <div class="user-icon">
                     <img v-if="player.iconUrl" :src="player.iconUrl" alt="User icon" />
                 </div>
@@ -15,18 +15,23 @@
                     <span class="username" v-html="formatText(player.name)"></span>
                     <span class="userDesc" v-html="formatText(player.introduction)"></span>
                 </div>
-                
+
                 <div class="user-rank-id-pts">
                     <span class="userRank">Rank {{ player.rank }}</span>
                     <span class="userId">#{{ player.uid }}</span>
                     <span class="userPts">{{ player.points.toLocaleString() }} Pts</span>
                 </div>
             </div>
-            
+
             <div class="data-box">
                 <span>Differential (vs 1h ago)</span>
-                <span class="differential-pts" v-if="differencesCalculated && differences.length > index && differences[index] !== undefined">
+                <span class="differential-pts"
+                    v-if="differencesCalculated && differences.length > index && differences[index] !== undefined">
                     +{{ differences[index].toLocaleString() }} Points
+                </span>
+                <span> Pts/2 mins: </span>
+                <span v-if="finalPaceValues.length > 0 && finalPaceValues[index] !== undefined" class="pts-min">
+                    {{ finalPaceValues[index].toLocaleString() }}
                 </span>
             </div>
         </div>
@@ -54,6 +59,7 @@ interface IntervalPlayerData {
 export default class TopRankings extends Vue {
     private players: PlayerData[] = [];
     private filteredPlayers: IntervalPlayerData[] = [];
+    private finalPaceValues: number[] = []; 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     private isLoading = true;
@@ -112,7 +118,7 @@ export default class TopRankings extends Vue {
             }
 
             const data = await response.json();
-            console.log('Leaderboard raw data:', data);
+            // console.log('Leaderboard raw data:', data);
             
             const topPlayersPromises = data.points.slice(0, 10).map(async (point: any) => {
                 const user = data.users.find((u: any) => u.uid === point.uid);
@@ -129,7 +135,6 @@ export default class TopRankings extends Vue {
             });
             
             this.players = await Promise.all(topPlayersPromises);
-            console.log('Processed players:', this.players);
         } catch (error) {
             console.error('Leaderboard fetch error:', error);
         } finally {
@@ -140,7 +145,6 @@ export default class TopRankings extends Vue {
     private async fetchIntervalData() {
         this.isLoading = true;
         try {
-            console.log('Fetching interval data from:', `${this.API_BASE}/intervaldata`);
             const response = await fetch(`${this.API_BASE}/intervaldata`);
             
             if (!response.ok) {
@@ -151,14 +155,12 @@ export default class TopRankings extends Vue {
             }
 
             const data = await response.json();
-            console.log('Interval raw data:', data);
             
             data.points.splice(-10, 10); 
             this.filteredPlayers = data.points.slice(-10).map((point: any) => ({
                 uid: point.uid,
                 points: point.value
             }));
-            console.log('Processed interval data:', this.filteredPlayers);
         } catch (error) {
             console.error('Interval data fetch error:', error);
         } finally {
@@ -175,11 +177,56 @@ export default class TopRankings extends Vue {
         );
     }
 
+    private async paceCalculations() {
+        this.isLoading = true;
+        try {
+            const startResponse = await fetch(`${this.API_BASE}/startdata`);
+            if (!startResponse.ok) {
+                throw new Error(`Failed to fetch start data: HTTP ${startResponse.status}`);
+            }
+            const startData = await startResponse.json();
+
+            const startingT10 = startData.points.slice(0, 10).map((point: any) => {
+                const user = startData.users.find((u: any) => u.uid === point.uid);
+                return {
+                    uid: point.uid,
+                    name: user?.name || 'Unknown',
+                    points: point.value,
+                    time: point.time,
+                };
+            });
+            console.log("starting t10: ", startingT10);
+
+            const leaderboardResponse = await fetch(`${this.API_BASE}/leaderboard`);
+            if (!leaderboardResponse.ok) {
+                throw new Error(`Failed to fetch leaderboard: HTTP ${leaderboardResponse.status}`);
+            }
+            const leaderboardData = await leaderboardResponse.json();
+            console.log("current lb data: ", leaderboardData);
+
+            this.finalPaceValues = [];
+
+            // add calcs here
+            for (let i = 0; i < leaderboardData.points.length && i < 10; i++) {
+                const timeDifference = leaderboardData.points[i].time - startingT10[i].time;
+                const finalPace = Math.floor(leaderboardData.points[i].value / (timeDifference / 120000));  // Points per minute calculation
+                this.finalPaceValues.push(finalPace);
+                console.log(`final pace for player ${i}: `, finalPace);
+            }
+        } catch (error) {
+            console.error('Interval data fetch error:', error);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
     async mounted(): Promise<void> {
         await this.fetchLeaderboardData();
         await this.fetchIntervalData();
 
         this.differencesCalculated = true;
+
+        this.paceCalculations();
     }
 }
 </script>
@@ -284,7 +331,8 @@ export default class TopRankings extends Vue {
         align-items: center;
     }
 
-    .differential-pts {
+    .differential-pts,
+    .pts-min {
         color: greenyellow;
         display: flex;
     }

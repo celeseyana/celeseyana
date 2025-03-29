@@ -13,26 +13,6 @@
                 <!-- <input v-model="currentEventPoints" placeholder="Current event points" class="input-field-ep"/> -->
             </div>
         </div>
-        <div id="selector-header">Event Type</div>
-        <select class="evt-selector">
-            <option>Normal</option>
-            <option>Challenge Live</option>
-            <option>VS Live</option>
-            <option>Live Goals</option>
-            <option>Mission Live</option>
-            <option>Team Live Festival</option>
-            <option>Medley Live</option>
-        </select>
-        <!-- <div id="selector-header">Event Type {{ selected }}</div>
-        <select class="evt-selector" v-model="selected">
-            <option>Normal</option>
-            <option>Challenge Live</option>
-            <option>VS Live</option>
-            <option>Live Goals</option>
-            <option>Mission Live</option>
-            <option>Team Live Festival</option>
-            <option>Medley Live</option>
-        </select> -->
         <button>Submit</button>
         <!-- needs a separate field if CL -->
     </div>
