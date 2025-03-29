@@ -107,7 +107,6 @@ export default class TopRankings extends Vue {
     private async fetchLeaderboardData() {
         this.isLoading = true;
         try {
-            console.log('Fetching leaderboard from:', `${this.API_BASE}/leaderboard`);
             const response = await fetch(`${this.API_BASE}/leaderboard`);
             
             if (!response.ok) {
@@ -118,7 +117,6 @@ export default class TopRankings extends Vue {
             }
 
             const data = await response.json();
-            // console.log('Leaderboard raw data:', data);
             
             const topPlayersPromises = data.points.slice(0, 10).map(async (point: any) => {
                 const user = data.users.find((u: any) => u.uid === point.uid);
@@ -195,14 +193,12 @@ export default class TopRankings extends Vue {
                     time: point.time,
                 };
             });
-            console.log("starting t10: ", startingT10);
 
             const leaderboardResponse = await fetch(`${this.API_BASE}/leaderboard`);
             if (!leaderboardResponse.ok) {
                 throw new Error(`Failed to fetch leaderboard: HTTP ${leaderboardResponse.status}`);
             }
             const leaderboardData = await leaderboardResponse.json();
-            console.log("current lb data: ", leaderboardData);
 
             this.finalPaceValues = [];
 
@@ -211,7 +207,6 @@ export default class TopRankings extends Vue {
                 const timeDifference = leaderboardData.points[i].time - startingT10[i].time;
                 const finalPace = Math.floor(leaderboardData.points[i].value / (timeDifference / 120000));  // Points per minute calculation
                 this.finalPaceValues.push(finalPace);
-                console.log(`final pace for player ${i}: `, finalPace);
             }
         } catch (error) {
             console.error('Interval data fetch error:', error);
