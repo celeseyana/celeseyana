@@ -16,6 +16,7 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@fontsource/montserrat": "^5.2.5",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
@@ -23,6 +24,7 @@
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "@types/dompurify": "^3.0.5",
     "axios": "^1.8.4",
+    "bulma": "^1.0.3",
     "cors": "^2.8.5",
     "dompurify": "^3.2.4",
     "express": "^4.21.2",

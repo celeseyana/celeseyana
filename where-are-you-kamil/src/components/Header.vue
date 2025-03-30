@@ -1,17 +1,14 @@
 <template>
 	<div class="main-header">
-        <span id="main-span">where is kamil?</span>
-
         <div id="main-icon">
             <img id="kamil-icon" src="/main_icon.webp" />
-            <span id="icon-desc">a tool to find out where is kamil</span>
+            <span id="icon-desc">finding kamil</span>
         </div>
 
         <a href="https://github.com/celeseyana/where-are-you-kamil" class="github" target="_blank">
             <font-awesome-icon :icon="['fab', 'github']" class="github-inner"/>
         </a>	
     </div>
-
 </template>
 
 <script lang="ts">
@@ -25,12 +22,12 @@ export default defineComponent({
 <style>
 	.main-header {
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
 		align-items: center;
-		justify-content: space-between;
-		position: relative;
-		width: 100%;
-        max-height: 2vw;
+        justify-content: center;
+		position: absolute;
+        width: 128px;
+		height: 100%;
 	}
 
     #main-span {
@@ -39,26 +36,30 @@ export default defineComponent({
     }
 
     #kamil-icon {
-        width: 1.5vw;
-        height: 1.5vw;
+        width: 80px;
+        height: 80px;
         margin: 5%;
     }
 
     #main-icon {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         color: white;
     }
 
-    .github {
-        margin-right: 1%;
+    #icon-desc {
+        align-items: center;
+        justify-content: center;
+        font-family: 'Montserrat', sans-serif;
+        font-size: large;
+        margin: 20px 0px 20px 0px;
     }
 
     .github-inner {
-        width: 1.5vw;
-        height: 1.5vw;
+        width: 50px;
+        height: 50px;
         color: white;
     }
 </style>

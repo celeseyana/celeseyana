@@ -1,40 +1,71 @@
 <template>
     <div class="t10-leaderboard-container">
-        <div v-for="(player, index) in players" :key="player.uid" class="leaderboard-row-container">
-            <div class="leaderboard-row" :id="'rank-' + (index + 1)">
-                <div class="event-rank">
-                    <img v-if="index < 3" :src="'/en_' + (index + 1) + '.png'" />
-                    <span v-else>#{{ index + 1 }}</span>
-                </div>
+        <div class="leaderboard-columns">
+            <div class="leaderboard-column">
+                <div v-for="(player, index) in players.slice(0, 5)" :key="player.uid" class="leaderboard-row-container">
+                    <div class="leaderboard-row" :id="'rank-' + (index + 1)">
+                        <div class="event-rank">
+                            <img v-if="index < 3" :src="'/en_' + (index + 1) + '.png'" />
+                            <span v-else>#{{ index + 1 }}</span>
+                        </div>
 
-                <div class="user-icon">
-                    <img v-if="player.iconUrl" :src="player.iconUrl" alt="User icon" />
-                </div>
+                        <div class="user-icon">
+                            <img v-if="player.iconUrl" :src="player.iconUrl" alt="User icon" />
+                        </div>
 
-                <div class="user-name-desc">
-                    <span class="username" v-html="formatText(player.name)"></span>
-                    <span class="userDesc" v-html="formatText(player.introduction)"></span>
-                </div>
+                        <div class="user-name-desc">
+                            <span class="username" v-html="formatText(player.name)"></span>
+                            <span class="userDesc" v-html="formatText(player.introduction)"></span>
+                        </div>
 
-                <div class="user-rank-id-pts">
-                    <span class="userRank">Rank {{ player.rank }}</span>
-                    <span class="userId">#{{ player.uid }}</span>
-                    <span class="userPts">{{ player.points.toLocaleString() }} Pts</span>
+                        <div class="user-rank-id-pts">
+                            <span class="userRank">Rank {{ player.rank }}</span>
+                            <span class="userPts">{{ player.points.toLocaleString() }} pts</span>
+                            <span class="differential-pts"
+                                v-if="differencesCalculated && differences.length > index && differences[index] !== undefined">
+                                +{{ differences[index].toLocaleString() }}
+                            </span>
+                            <span v-if="finalPaceValues.length > 0 && finalPaceValues[index] !== undefined" class="pts-min">
+                                +{{ finalPaceValues[index].toLocaleString() }} pts/2 min avg.
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
+            
+            <div class="leaderboard-column">
+                <div v-for="(player, index) in players.slice(5, 10)" :key="player.uid" class="leaderboard-row-container">
+                    <div class="leaderboard-row" :id="'rank-' + (index + 6)">
+                        <div class="event-rank">
+                            <span>#{{ index + 6 }}</span>
+                        </div>
 
-            <div class="data-box">
-                <span>Differential (per last hourly snapshot)</span>
-                <span class="differential-pts"
-                    v-if="differencesCalculated && differences.length > index && differences[index] !== undefined">
-                    +{{ differences[index].toLocaleString() }} Points
-                    <span class="tooltip-text">Data Snapshot was fetched @ {{ snapshotTime }} (GMT +8)</span>
-                </span>
-                <span> Pts/2 mins: </span>
-                <span v-if="finalPaceValues.length > 0 && finalPaceValues[index] !== undefined" class="pts-min">
-                    {{ finalPaceValues[index].toLocaleString() }}
-                </span>
+                        <div class="user-icon">
+                            <img v-if="player.iconUrl" :src="player.iconUrl" alt="User icon" />
+                        </div>
+
+                        <div class="user-name-desc">
+                            <span class="username" v-html="formatText(player.name)"></span>
+                            <span class="userDesc" v-html="formatText(player.introduction)"></span>
+                        </div>
+
+                        <div class="user-rank-id-pts">
+                            <span class="userRank">Rank {{ player.rank }}</span>
+                            <span class="userPts">{{ player.points.toLocaleString() }} pts</span>
+                            <span class="differential-pts"
+                                v-if="differencesCalculated && differences.length > (index + 5) && differences[index + 5] !== undefined">
+                                +{{ differences[index + 5].toLocaleString() }}
+                            </span>
+                            <span v-if="finalPaceValues.length > 0 && finalPaceValues[index] !== undefined" class="pts-min">
+                                +{{ finalPaceValues[index + 5].toLocaleString() }} pts/2 min avg.
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
+        <div class="data-last-snapshot-text">
+            <span>Interval data fetched @ {{ snapshotTime }} GMT+8</span>
         </div>
     </div>
 </template>
@@ -249,153 +280,149 @@ export default class TopRankings extends Vue {
 </script>
 
 <style>
+    .t10-leaderboard-container {
+        display: flex;
+        position: relative;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .leaderboard-columns {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .leaderboard-column {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
     .leaderboard-row {
         width: 600px;
-        height: 70px;
+        height: 100px;
         background-color: rgba(245, 245, 245, 0.4);
         border-radius: 10px;
         display: flex;
-        flex-direction: row;
         align-items: center;
-        gap: 20px;
-        margin-bottom: 10px;
+        padding: 0 15px;
+        box-sizing: border-box;
     }
 
     .event-rank {
-        width: 128px;
+        width: 60px;
         display: flex;
         justify-content: center;
         align-items: center;
-    }
-
-    .user-icon {
-        width: 64px;
-        height: 64px;
-        border-radius: 10px;
-        background-color: aliceblue;
         flex-shrink: 0;
     }
 
+    .event-rank img {
+        width: 40px;
+        height: 20px;
+    }
+
+    .user-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        background-color: aliceblue;
+        flex-shrink: 0;
+        overflow: hidden;
+        margin-left: 4%;
+    }
+
     .user-icon img {
-        width: 64px;
-        height: 64px;
-    }
-
-    .t10-leaderboard-container {
-        position: relative;
         width: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 1%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .user-name-desc {
-        width: 40%;
-    }
-
-    .user-rank-id-pts,
-    .user-name-desc {
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        margin-left: 4%;
+        overflow: hidden;
+    }
+
+    .user-rank-id-pts {
+        margin-left: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        padding-right: 15px;
+        min-width: 120px;
     }
 
     .username,
     .userDesc {
         line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .username strong, 
-    .userDesc strong {
+    .username {
+        font-weight: bold;
+        margin-bottom: 2px;
+    }
+
+    .userDesc {
+        font-size: 0.9em;
+        opacity: 0.8;
+    }
+
+    .userRank {
+        font-size: 0.9em;
+        margin-bottom: 2px;
+    }
+
+    .userPts {
         font-weight: bold;
     }
 
-    .username sup, 
-    .userDesc sup {
-        vertical-align: super;
-        font-size: 0.8em;
-    }
-
-    .username sub, 
-    .userDesc sub {
-        vertical-align: sub;
-        font-size: 0.8em;
-    }
-
-    .username [style*="text-align: center"], 
-    .userDesc [style*="text-align: center"] {
-        display: block;
-        text-align: center;
-    }
-
-    .leaderboard-row-container {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .data-box {
-        width: 150px;
-        height: 70px;
-        background-color: rgba(245, 245, 245, 0.4);
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .differential-pts,
     .pts-min {
-        color: greenyellow;
-        display: flex;
+        color: rgb(173, 255, 173);
     }
 
     .differential-pts {
+        color: greenyellow;
+        font-size: 0.9em;
         display: inline-flex;
         align-items: center;
         position: relative;
         cursor: pointer;
     }
 
-    .differential-pts .tooltip-text {
-        visibility: hidden;
-        background-color: #555;
-        color: #fff;
-        text-align: center;
-        padding: 8px 12px;
-        border-radius: 6px;
-        white-space: nowrap;
-        
-        position: absolute;
-        left: 100%;
-        margin-left: 10px;
-        
+    .data-last-snapshot-text {
+        background-color: rgba(245, 245, 245, 0.4);
+        margin-top: 1%;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        
-        opacity: 0;
-        transition: opacity 0.3s;
-        
-        width: auto;
-        min-width: 40px;
+        flex-direction: row;
+        align-items: flex-start;
     }
 
-    .differential-pts .tooltip-text::after {
-        content: "";
-        position: absolute;
-        right: 100%;
-        border-width: 5px;
-        border-style: solid;
-        border-color: transparent #555 transparent transparent;
+    .data-last-snapshot-text span {
+        margin: 5px;
     }
 
-    .differential-pts:hover .tooltip-text {
-        visibility: visible;
-        opacity: 1;
+    @media (max-width: 1400px) {
+        .leaderboard-columns {
+            flex-direction: column;
+        }
+        
+        .leaderboard-row {
+            height: auto;
+            padding: 10px;
+        }
+        
+        .user-name-desc {
+            flex-direction: column;
+        }
     }
 </style>
