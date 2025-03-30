@@ -28,7 +28,7 @@
                 <span class="differential-pts"
                     v-if="differencesCalculated && differences.length > index && differences[index] !== undefined">
                     +{{ differences[index].toLocaleString() }} Points
-                    <span class="tooltip-text">Data Snapshot was fetched @ {{ snapshotTime }}</span>
+                    <span class="tooltip-text">Data Snapshot was fetched @ {{ snapshotTime }} (GMT +8)</span>
                 </span>
                 <span> Pts/2 mins: </span>
                 <span v-if="finalPaceValues.length > 0 && finalPaceValues[index] !== undefined" class="pts-min">
