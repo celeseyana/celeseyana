@@ -26,7 +26,7 @@
                                 +{{ differences[index].toLocaleString() }}
                             </span>
                             <span v-if="finalPaceValues.length > 0 && finalPaceValues[index] !== undefined" class="pts-min">
-                                +{{ finalPaceValues[index].toLocaleString() }} pts/2 min avg.
+                                +{{ finalPaceValues[index].toLocaleString() }} pts/min.
                             </span>
                         </div>
                     </div>
@@ -57,7 +57,7 @@
                                 +{{ differences[index + 5].toLocaleString() }}
                             </span>
                             <span v-if="finalPaceValues.length > 0 && finalPaceValues[index] !== undefined" class="pts-min">
-                                +{{ finalPaceValues[index + 5].toLocaleString() }} pts/2 min avg.
+                                +{{ finalPaceValues[index + 5].toLocaleString() }} pts/min.
                             </span>
                         </div>
                     </div>
@@ -258,7 +258,7 @@ export default class TopRankings extends Vue {
             // add calcs here
             for (let i = 0; i < leaderboardData.points.length && i < 10; i++) {
                 const timeDifference = leaderboardData.points[i].time - startingT10[i].time;
-                const finalPace = Math.floor(leaderboardData.points[i].value / (timeDifference / 120000));  // Points per minute calculation
+                const finalPace = Math.floor(leaderboardData.points[i].value / (timeDifference / 60000));
                 this.finalPaceValues.push(finalPace);
             }
         } catch (error) {
