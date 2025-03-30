@@ -24,10 +24,11 @@
             </div>
 
             <div class="data-box">
-                <span>Differential (vs 1h ago)</span>
+                <span>Differential (per last hourly snapshot)</span>
                 <span class="differential-pts"
                     v-if="differencesCalculated && differences.length > index && differences[index] !== undefined">
                     +{{ differences[index].toLocaleString() }} Points
+                    <span class="tooltip-text">Data Snapshot was fetched @ {{ snapshotTime }}</span>
                 </span>
                 <span> Pts/2 mins: </span>
                 <span v-if="finalPaceValues.length > 0 && finalPaceValues[index] !== undefined" class="pts-min">
@@ -54,6 +55,7 @@ interface PlayerData {
 interface IntervalPlayerData {
     uid: number;
     points: number;
+    time: number;
 }
 
 export default class TopRankings extends Vue {
@@ -64,6 +66,7 @@ export default class TopRankings extends Vue {
     // @ts-ignore
     private isLoading = true;
     private differencesCalculated = false;
+    private snapshotTime = '';
 
     private formatText(text: string): string {
         if (!text) return '';
@@ -140,6 +143,17 @@ export default class TopRankings extends Vue {
         }
     }
 
+    private convertEpochToGMT8(epochTime: number): string {
+        const date = new Date(epochTime);
+        return date.toLocaleTimeString('en-US', {
+            timeZone: 'Asia/Singapore',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+    }
+
     private async fetchIntervalData() {
         this.isLoading = true;
         try {
@@ -155,10 +169,18 @@ export default class TopRankings extends Vue {
             const data = await response.json();
             
             data.points.splice(-10, 10); 
+
             this.filteredPlayers = data.points.slice(-10).map((point: any) => ({
                 uid: point.uid,
-                points: point.value
+                points: point.value,
+                time: point.time       
             }));
+
+            if (this.filteredPlayers.length > 0) {
+                this.snapshotTime = this.convertEpochToGMT8(
+                    this.filteredPlayers[this.filteredPlayers.length - 1].time
+                );
+            }
         } catch (error) {
             console.error('Interval data fetch error:', error);
         } finally {
@@ -330,5 +352,50 @@ export default class TopRankings extends Vue {
     .pts-min {
         color: greenyellow;
         display: flex;
+    }
+
+    .differential-pts {
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .differential-pts .tooltip-text {
+        visibility: hidden;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        padding: 8px 12px;
+        border-radius: 6px;
+        white-space: nowrap;
+        
+        position: absolute;
+        left: 100%;
+        margin-left: 10px;
+        
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        opacity: 0;
+        transition: opacity 0.3s;
+        
+        width: auto;
+        min-width: 40px;
+    }
+
+    .differential-pts .tooltip-text::after {
+        content: "";
+        position: absolute;
+        right: 100%;
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent #555 transparent transparent;
+    }
+
+    .differential-pts:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
     }
 </style>
