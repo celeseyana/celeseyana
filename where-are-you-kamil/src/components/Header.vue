@@ -63,7 +63,7 @@ export default defineComponent({
         color: white;
     }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 900px) {
         .main-header {
             width: 100%;
             height: fit-content;

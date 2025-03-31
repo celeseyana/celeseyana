@@ -506,7 +506,7 @@ export default class TopRankings extends Vue {
         }
     }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 900px) {
         .t10-leaderboard-container {
             display: flex;
             flex-direction: column;

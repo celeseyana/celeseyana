@@ -42,7 +42,7 @@
 		overflow-y: hidden;
 	}
 
-	@media (max-width: 1100px) {
+	@media (max-width: 900px) {
 		html, body {
 			overflow: auto;
 		}
