@@ -62,4 +62,35 @@ export default defineComponent({
         height: 50px;
         color: white;
     }
+
+    @media (max-width: 900px) {
+        .main-header {
+            width: 100%;
+            height: fit-content;
+            display: flex;
+            flex-direction: row;
+            position: absolute;
+        }
+
+        #kamil-icon {
+            width: 40px;
+            height: 40px;
+            margin: 3.75%;
+        }
+
+        #main-icon {
+            flex-direction: row;
+        }
+        
+        #icon-desc {
+            font-size: 0.75em;
+            margin: 15px 0;
+        }
+        
+        .github-inner {
+            width: 24px;
+            height: 24px;
+        }
+    }
+
 </style>

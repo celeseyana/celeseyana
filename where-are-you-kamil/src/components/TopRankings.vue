@@ -363,7 +363,6 @@ export default class TopRankings extends Vue {
     .userDesc {
         line-height: 1.3;
         white-space: nowrap;
-        overflow: hidden;
         text-overflow: ellipsis;
     }
 
@@ -412,17 +411,144 @@ export default class TopRankings extends Vue {
     }
 
     @media (max-width: 1400px) {
+        .t10-leaderboard-container {
+            justify-content: center;
+            align-items: center;
+            padding: 14px;
+        }
+        
         .leaderboard-columns {
-            flex-direction: column;
+            gap: 7px;
         }
         
         .leaderboard-row {
-            height: auto;
-            padding: 10px;
+            width: 420px;
+            height: 70px;
+            padding: 7px;
+            border-radius: 7px;
+        }
+        
+        .event-rank {
+            width: 42px;
+        }
+        
+        .event-rank img {
+            width: 28px;
+            height: 14px;
+        }
+        
+        .user-icon {
+            width: 35px;
+            height: 35px;
+            margin-left: 3%;
         }
         
         .user-name-desc {
+            margin-left: 3%;
+        }
+        
+        .username {
+            font-size: 0.85em;
+            margin-bottom: 1px;
+        }
+        
+        .userDesc,
+        .userRank,
+        .differential-pts {
+            font-size: 0.8em;
+        }
+        
+        .user-rank-id-pts {
+            padding-right: 10px;
+            min-width: 84px;
+        }
+        
+        .data-last-snapshot-text span {
+            font-size: 0.8em;
+            margin: 3px;
+        }
+    }
+
+    @media (max-width: 1100px) {
+        .leaderboard-row {
+            width: 95%;
+            max-width: 420px;
+            height: 60px;
+            padding: 5px;
+            font-size: small;
+        }
+        
+        .leaderboard-columns {
+            gap: 6px;
+        }
+
+        .event-rank {
+            width: 44px;
+        }
+        
+        .event-rank img {
+            width: 30px;
+            height: 18px;
+        }
+        
+        .user-icon {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .user-rank-id-pts {
+            min-width: 100px;
+        }
+
+        .user-rank-id-pts span {
+            font-size: 0.9em;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .t10-leaderboard-container {
+            display: flex;
             flex-direction: column;
+            min-height: 100vh;
+            padding: 10px;
+            margin-top: 60px;
+        }
+
+        .leaderboard-row {
+            width: 95%;
+            max-width: 280px;
+            min-height: 60px;
+            padding: 8px;
+            font-size: small;
+        }
+        
+        .leaderboard-columns {
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            margin-top: 0;
+        }
+
+        .event-rank {
+            width: 30px;
+        }
+        
+        .event-rank img {
+            width: 30px;
+            height: 18px;
+        }
+        
+        .user-icon {
+            width: 30px;
+            height: 30px;
+        }
+        
+        .user-rank-id-pts {
+            min-width: 80px;
+        }
+
+        .user-rank-id-pts span {
+            font-size: 0.8em;
         }
     }
 </style>

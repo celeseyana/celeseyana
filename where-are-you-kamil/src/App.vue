@@ -1,7 +1,7 @@
 <template>
 	<div class="body-container">
-			<Header />
-			<MayaBackground />
+		<Header />
+		<MayaBackground />
 		<div class="content-area">
 			<TopRankings />
 		</div>
@@ -21,11 +21,11 @@
 		height: 100vh;
 		margin: 0;
 		padding: 0;
-		overflow: hidden;
 	}
 
 	.body-container {
 		display: flex;
+		flex-direction: column;
 		width: 100%;
 		height: 100%;
 		position: absolute;
@@ -33,8 +33,12 @@
 
 	.content-area {
 		flex: 1;
-		overflow: auto;
+		height: 100%;
 		position: relative;
-		margin-left: 128px;
+		display: flex;
+		justify-content: center;
+		margin-left: 0;
+		padding: 20px;
+		box-sizing: border-box;
 	}
 </style>
