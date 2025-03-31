@@ -471,7 +471,6 @@ export default class TopRankings extends Vue {
 
     @media (max-width: 1100px) {
         .leaderboard-row {
-            width: 95%;
             max-width: 420px;
             height: 60px;
             padding: 5px;
@@ -514,7 +513,6 @@ export default class TopRankings extends Vue {
         }
 
         .leaderboard-row {
-            width: 95%;
             max-width: 280px;
             min-height: 60px;
             padding: 8px;
@@ -548,6 +546,10 @@ export default class TopRankings extends Vue {
 
         .user-rank-id-pts span {
             font-size: 0.8em;
+        }
+
+        .data-last-snapshot-text {
+            margin-top: 10px;
         }
     }
 </style>
