@@ -17,31 +17,36 @@
 
 <style>
 	html, body {
-		width: 100vw;
-		height: 100vh;
 		margin: 0;
 		padding: 0;
+		overflow: hidden;
 	}
 
 	.body-container {
-		display: flex;
-		flex-direction: column;
 		width: 100%;
 		height: 100%;
+		display: flex;
+		flex-direction: column;
 		position: relative;
+		overflow: hidden;
 	}
 
 	.content-area {
-		flex: 1;
+		width: 100%;
 		height: 100%;
-		position: relative;
 		display: flex;
 		justify-content: center;
+		align-items: center;
 		padding: 20px;
 		box-sizing: border-box;
+		overflow-y: hidden;
 	}
 
 	@media (max-width: 900px) {
+		html, body {
+			overflow: auto;
+		}
+
 		.content-area {
 			overflow-y: auto;
 			margin-top: 60px;

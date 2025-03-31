@@ -281,20 +281,22 @@ export default class TopRankings extends Vue {
 
 <style>
     .t10-leaderboard-container {
+        width: 100vw;
+        height: 100vh;
         display: flex;
         position: relative;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 100%;
         padding: 20px;
-        box-sizing: border-box;
+        overflow: visible;
     }
 
     .leaderboard-columns {
         display: flex;
         gap: 10px;
         justify-content: center;
+        overflow: visible;
     }
 
     .leaderboard-column {
@@ -523,7 +525,7 @@ export default class TopRankings extends Vue {
             flex-direction: column;
             gap: 10px;
             position: relative;
-            margin-top: 0;
+            margin-top: 20px;
         }
 
         .event-rank {
