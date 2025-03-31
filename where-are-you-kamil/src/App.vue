@@ -28,7 +28,7 @@
 		flex-direction: column;
 		width: 100%;
 		height: 100%;
-		position: absolute;
+		position: relative;
 	}
 
 	.content-area {
@@ -37,8 +37,19 @@
 		position: relative;
 		display: flex;
 		justify-content: center;
-		margin-left: 0;
 		padding: 20px;
 		box-sizing: border-box;
+	}
+
+	@media (max-width: 900px) {
+		.content-area {
+			overflow-y: auto;
+			margin-top: 60px;
+			padding-top: 10px;
+		}
+
+		.t10-leaderboard-container {
+			padding-bottom: 20px;
+		}
 	}
 </style>

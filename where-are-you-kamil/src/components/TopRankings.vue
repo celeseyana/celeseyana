@@ -509,9 +509,8 @@ export default class TopRankings extends Vue {
         .t10-leaderboard-container {
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
             padding: 10px;
-            margin-top: 60px;
+            position: relative;
         }
 
         .leaderboard-row {
