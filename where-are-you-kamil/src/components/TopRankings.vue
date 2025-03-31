@@ -70,6 +70,8 @@
     </div>
 </template>
 
+<!-- test again -->
+
 <script lang="ts">
 import { Vue } from 'vue-class-component';
 import DOMPurify from 'dompurify';
