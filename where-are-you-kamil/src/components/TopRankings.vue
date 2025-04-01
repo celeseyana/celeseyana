@@ -390,10 +390,6 @@ export default class TopRankings extends Vue {
     .leaderboard-row {
         border: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 25px;
-        padding-bottom: 1rem;
-    }
-    
-    .leaderboard-row:last-child {
         padding-bottom: 0;
     }
     
