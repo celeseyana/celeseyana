@@ -1,76 +1,113 @@
 <template>
-    <div class="t10-leaderboard-container">
-        <div class="leaderboard-columns">
-            <div class="leaderboard-column">
-                <div v-for="(player, index) in players.slice(0, 5)" :key="player.uid" class="leaderboard-row-container">
-                    <div class="leaderboard-row" :id="'rank-' + (index + 1)">
-                        <div class="event-rank">
-                            <img v-if="index < 3" :src="'/en_' + (index + 1) + '.png'" />
-                            <span v-else>#{{ index + 1 }}</span>
+    <div class="loader-container" v-if="isLoading">
+        <div class="loader"></div>
+    </div>
+    <div class="has-text-centered interval-data">
+        <span class="is-size-9">
+            Interval data fetched @ {{ snapshotTime }} GMT+8
+        </span>
+    </div>
+    <div class="box t10-container has-background-dark has-text-white" v-if="!isLoading">
+        <div class="columns is-multiline">
+            <div class="column is-half">
+                <div v-for="(player, index) in players.slice(0, 5)" :key="player.uid" class="leaderboard-row mb-4">
+                    <article class="media">
+                        <div class="media-left">
+                            <div class="event-rank">
+                                <img v-if="index < 3" :src="'/en_' + (index + 1) + '.png'" width="40" />
+                                <span v-else class="tag is-medium is-dark">#{{ index + 1 }}</span>
+                            </div>
                         </div>
-
-                        <div class="user-icon">
-                            <img v-if="player.iconUrl" :src="player.iconUrl" alt="User icon" />
+                        
+                        <div class="media-left player-icon">
+                            <figure class="image is-48x48">
+                                <img class="is-rounded" :src="player.iconUrl || getFallbackIconUrl()" alt="User icon">
+                            </figure>
                         </div>
-
-                        <div class="user-name-desc">
-                            <span class="username" v-html="formatText(player.name)"></span>
-                            <span class="userDesc" v-html="formatText(player.introduction)"></span>
+                        
+                        <div class="media-content">
+                            <div class="content">
+                                <p class="mb-1 has-text-white">
+                                    <strong v-html="formatText(player.name)"></strong>
+                                </p>
+                                <p class="is-size-7 has-text-light" v-html="formatText(player.introduction)"></p>
+                            </div>
                         </div>
-
-                        <div class="user-rank-id-pts">
-                            <span class="userRank">Rank {{ player.rank }}</span>
-                            <span class="userPts">{{ player.points.toLocaleString() }} pts</span>
-                            <span class="differential-pts"
-                                v-if="differencesCalculated && differences.length > index && differences[index] !== undefined">
-                                +{{ differences[index].toLocaleString() }}
-                            </span>
-                            <span v-if="finalPaceValues.length > 0 && finalPaceValues[index] !== undefined" class="pts-min">
-                                +{{ finalPaceValues[index].toLocaleString() }} pts/min.
-                            </span>
+                        
+                        <div class="media-right player-stuff">
+                            <div class="tags has-addons player-rank">
+                                <span class="tag is-dark">Rank</span>
+                                <span class="tag is-info">{{ player.rank }}</span>
+                            </div>
+                            <div class="mt-2">
+                                <span class="tag is-success">
+                                    {{ player.points.toLocaleString() }} pts
+                                </span>
+                            </div>
+                            <div v-if="differencesCalculated && differences.length > index" class="mt-2">
+                                <span class="tag is-warning">
+                                    +{{ differences[index].toLocaleString() }}
+                                </span>
+                            </div>
+                            <div v-if="finalPaceValues.length > index" class="mt-2">
+                                <span class="tag is-primary">
+                                    +{{ finalPaceValues[index].toLocaleString() }} pts/min
+                                </span>
+                            </div>
                         </div>
-                    </div>
+                    </article>
                 </div>
             </div>
             
-            <div class="leaderboard-column">
-                <div v-for="(player, index) in players.slice(5, 10)" :key="player.uid" class="leaderboard-row-container">
-                    <div class="leaderboard-row" :id="'rank-' + (index + 6)">
-                        <div class="event-rank">
-                            <span>#{{ index + 6 }}</span>
+            <div class="column is-half">
+                <div v-for="(player, index) in players.slice(5, 10)" :key="player.uid" class="leaderboard-row mb-4">
+                    <article class="media">
+                        <div class="media-left">
+                            <span class="tag is-medium is-dark">#{{ index + 6 }}</span>
                         </div>
-
-                        <div class="user-icon">
-                            <img v-if="player.iconUrl" :src="player.iconUrl" alt="User icon" />
+                        
+                        <div class="media-left player-icon">
+                            <figure class="image is-48x48">
+                                <img class="is-rounded" :src="player.iconUrl || getFallbackIconUrl()" alt="User icon">
+                            </figure>
                         </div>
-
-                        <div class="user-name-desc">
-                            <span class="username" v-html="formatText(player.name)"></span>
-                            <span class="userDesc" v-html="formatText(player.introduction)"></span>
+                        
+                        <div class="media-content">
+                            <div class="content">
+                                <p class="mb-1 has-text-white">
+                                    <strong v-html="formatText(player.name)"></strong>
+                                </p>
+                                <p class="is-size-7 has-text-light" v-html="formatText(player.introduction)"></p>
+                            </div>
                         </div>
-
-                        <div class="user-rank-id-pts">
-                            <span class="userRank">Rank {{ player.rank }}</span>
-                            <span class="userPts">{{ player.points.toLocaleString() }} pts</span>
-                            <span class="differential-pts"
-                                v-if="differencesCalculated && differences.length > (index + 5) && differences[index + 5] !== undefined">
-                                +{{ differences[index + 5].toLocaleString() }}
-                            </span>
-                            <span v-if="finalPaceValues.length > 0 && finalPaceValues[index] !== undefined" class="pts-min">
-                                +{{ finalPaceValues[index + 5].toLocaleString() }} pts/min.
-                            </span>
+                        
+                        <div class="media-right player-stuff">
+                            <div class="tags has-addons player-rank">
+                                <span class="tag is-dark">Rank</span>
+                                <span class="tag is-info">{{ player.rank }}</span>
+                            </div>
+                            <div class="mt-2">
+                                <span class="tag is-success">
+                                    {{ player.points.toLocaleString() }} pts
+                                </span>
+                            </div>
+                            <div v-if="differencesCalculated && differences.length > (index + 5)" class="mt-2">
+                                <span class="tag is-warning">
+                                    +{{ differences[index + 5].toLocaleString() }}
+                                </span>
+                            </div>
+                            <div v-if="finalPaceValues.length > (index + 5)" class="mt-2">
+                                <span class="tag is-primary">
+                                    +{{ finalPaceValues[index + 5].toLocaleString() }} pts/min
+                                </span>
+                            </div>
                         </div>
-                    </div>
+                    </article>
                 </div>
             </div>
         </div>
-        <div class="data-last-snapshot-text">
-            <span>Interval data fetched @ {{ snapshotTime }} GMT+8</span>
-        </div>
     </div>
 </template>
-
-<!-- test again -->
 
 <script lang="ts">
 import { Vue } from 'vue-class-component';
@@ -171,8 +208,6 @@ export default class TopRankings extends Vue {
             this.players = await Promise.all(topPlayersPromises);
         } catch (error) {
             console.error('Leaderboard fetch error:', error);
-        } finally {
-            this.isLoading = false;
         }
     }
 
@@ -216,8 +251,6 @@ export default class TopRankings extends Vue {
             }
         } catch (error) {
             console.error('Interval data fetch error:', error);
-        } finally {
-            this.isLoading = false;
         }
     }
 
@@ -265,295 +298,137 @@ export default class TopRankings extends Vue {
             }
         } catch (error) {
             console.error('Interval data fetch error:', error);
-        } finally {
-            this.isLoading = false;
         }
     }
 
     async mounted(): Promise<void> {
-        await this.fetchLeaderboardData();
-        await this.fetchIntervalData();
+        this.isLoading = true;
+        
+        try {
+            await Promise.all([
+                this.fetchLeaderboardData(),
+                this.fetchIntervalData(),
+                this.paceCalculations()
+            ]);
 
-        this.differencesCalculated = true;
-
-        this.paceCalculations();
+            this.differencesCalculated = true;
+        } catch (error) {
+            console.error("Error loading data:", error);
+        } finally {
+            this.isLoading = false;
+        }
     }
 }
 </script>
 
 <style>
-    .t10-leaderboard-container {
-        width: 100vw;
-        height: 100vh;
+    .loader-container {
+        position: fixed;
         display: flex;
-        position: relative;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        overflow: visible;
-    }
-
-    .leaderboard-columns {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        overflow: visible;
-    }
-
-    .leaderboard-column {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .leaderboard-row {
-        width: 600px;
-        height: 100px;
-        background-color: rgba(245, 245, 245, 0.4);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        padding: 0 15px;
-        box-sizing: border-box;
-    }
-
-    .event-rank {
-        width: 60px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-shrink: 0;
-    }
-
-    .event-rank img {
-        width: 40px;
-        height: 20px;
-    }
-
-    .user-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 10px;
-        background-color: aliceblue;
-        flex-shrink: 0;
-        overflow: hidden;
-        margin-left: 4%;
-    }
-
-    .user-icon img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        align-items: center;
+        justify-content: center;
     }
 
-    .user-name-desc {
+    .loader {
+        width: 50px;
+        aspect-ratio: 1;
+        display: grid;
+    }
+
+    .loader::before,
+    .loader::after {    
+        content:"";
+        grid-area: 1/1;
+        --c:no-repeat radial-gradient(farthest-side,#25b09b 92%,#0000);
+        background: 
+            var(--c) 50%  0, 
+            var(--c) 50%  100%, 
+            var(--c) 100% 50%, 
+            var(--c) 0    50%;
+        background-size: 12px 12px;
+        animation: l12 1s infinite;
+    }
+
+    .loader::before {
+        margin: 4px;
+        filter: hue-rotate(45deg);
+        background-size: 8px 8px;
+        animation-timing-function: linear
+    }
+
+    @keyframes l12 { 
+        100%{transform: rotate(.5turn)}
+    }
+
+    .interval-data {
+        justify-content: center;
+        align-items: center;
+        padding: 8px;
+    }
+
+    .t10-container {
         display: flex;
-        flex-direction: column;
-        margin-left: 4%;
+        position: relative;
+        width: 100%;
+        height: fit-content;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .box {
+        background-color: rgba(20, 22, 26, 0.75) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .media {
+        padding: 25px;
+    }
+    
+    .leaderboard-row {
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 25px;
+        padding-bottom: 1rem;
+    }
+    
+    .leaderboard-row:last-child {
+        padding-bottom: 0;
+    }
+    
+    .event-rank img {
+        height: 40px;
+        object-fit: contain;
+    }
+
+    .player-rank {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .media-content {
         overflow: hidden;
     }
-
-    .user-rank-id-pts {
-        margin-left: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        padding-right: 15px;
+    
+    .media-right {
+        text-align: right;
         min-width: 120px;
     }
 
-    .username,
-    .userDesc {
-        line-height: 1.3;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-
-    .username {
-        font-weight: bold;
-        margin-bottom: 2px;
-    }
-
-    .userDesc {
-        font-size: 0.9em;
-        opacity: 0.8;
-    }
-
-    .userRank {
-        font-size: 0.9em;
-        margin-bottom: 2px;
-    }
-
-    .userPts {
-        font-weight: bold;
-    }
-
-    .pts-min {
-        color: rgb(173, 255, 173);
-    }
-
-    .differential-pts {
-        color: greenyellow;
-        font-size: 0.9em;
-        display: inline-flex;
-        align-items: center;
-        position: relative;
-        cursor: pointer;
-    }
-
-    .data-last-snapshot-text {
-        background-color: rgba(245, 245, 245, 0.4);
-        margin-top: 1%;
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-    }
-
-    .data-last-snapshot-text span {
-        margin: 5px;
-    }
-
-    @media (max-width: 1400px) {
-        .t10-leaderboard-container {
-            justify-content: center;
-            align-items: center;
-            padding: 14px;
-        }
-        
-        .leaderboard-columns {
-            gap: 7px;
-        }
-        
-        .leaderboard-row {
-            width: 420px;
-            height: 70px;
-            padding: 7px;
-            border-radius: 7px;
-        }
-        
-        .event-rank {
-            width: 42px;
-        }
-        
-        .event-rank img {
-            width: 28px;
-            height: 14px;
-        }
-        
-        .user-icon {
-            width: 35px;
-            height: 35px;
-            margin-left: 3%;
-        }
-        
-        .user-name-desc {
-            margin-left: 3%;
-        }
-        
-        .username {
-            font-size: 0.85em;
-            margin-bottom: 1px;
-        }
-        
-        .userDesc,
-        .userRank,
-        .differential-pts {
-            font-size: 0.8em;
-        }
-        
-        .user-rank-id-pts {
-            padding-right: 10px;
-            min-width: 84px;
-        }
-        
-        .data-last-snapshot-text span {
-            font-size: 0.8em;
-            margin: 3px;
-        }
-    }
-
-    @media (max-width: 1100px) {
-        .leaderboard-row {
-            max-width: 420px;
-            height: 60px;
-            padding: 5px;
-            font-size: small;
-        }
-        
-        .leaderboard-columns {
-            gap: 6px;
-        }
-
-        .event-rank {
-            width: 44px;
-        }
-        
-        .event-rank img {
-            width: 30px;
-            height: 18px;
-        }
-        
-        .user-icon {
-            width: 40px;
-            height: 40px;
-        }
-        
-        .user-rank-id-pts {
-            min-width: 100px;
-        }
-
-        .user-rank-id-pts span {
-            font-size: 0.9em;
-        }
-    }
-
-    @media (max-width: 900px) {
-        .t10-leaderboard-container {
+    @media (max-width: 520px) {
+        .media {
             display: flex;
             flex-direction: column;
-            padding: 10px;
-            position: relative;
         }
 
-        .leaderboard-row {
-            max-width: 280px;
-            min-height: 60px;
-            padding: 8px;
-            font-size: small;
-        }
-        
-        .leaderboard-columns {
-            flex-direction: column;
-            gap: 10px;
-            position: relative;
-            margin-top: 20px;
+        .player-stuff {
+            margin-top: 15px;
         }
 
-        .event-rank {
-            width: 30px;
-        }
-        
-        .event-rank img {
-            width: 30px;
-            height: 18px;
-        }
-        
-        .user-icon {
-            width: 30px;
-            height: 30px;
-        }
-        
-        .user-rank-id-pts {
-            min-width: 80px;
-        }
-
-        .user-rank-id-pts span {
-            font-size: 0.8em;
-        }
-
-        .data-last-snapshot-text {
-            margin-top: 10px;
+        .player-icon {
+            margin-top: 15px;
+            margin-bottom: 15px;
         }
     }
 </style>

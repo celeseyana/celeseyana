@@ -1,59 +1,53 @@
 <template>
-	<div class="body-container">
-		<Header />
-		<MayaBackground />
-		<div class="content-area">
-			<TopRankings />
-		</div>
+	<Navbar />
+	<TopRankings />
+	<div class="site-background">
+		<img src="/trim_normal.png" />
 	</div>
 </template>
 
 <script setup lang="ts">
-	import MayaBackground from './components/MayaBackground.vue';
-	import Header from './components/Header.vue';
-	import TopRankings from './components/TopRankings.vue';
+import "bulma/css/bulma.css";
+import Navbar from './components/Navbar.vue';
+import TopRankings from './components/TopRankings.vue';
 </script>
 
 <style>
-	html, body {
+	html {
+		background-color: #14161a;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
 		margin: 0;
-		padding: 0;
-		overflow: hidden;
 	}
 
-	.body-container {
-		width: 100%;
-		height: 100%;
+	.site-background {
+		position: fixed;
 		display: flex;
-		flex-direction: column;
-		position: relative;
-		overflow: hidden;
-	}
-
-	.content-area {
-		width: 100%;
-		height: 100%;
-		display: flex;
-		justify-content: center;
 		align-items: center;
-		padding: 20px;
-		box-sizing: border-box;
-		overflow-y: hidden;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		opacity: 0.25;
+		z-index: -999;
+		bottom: 0;
 	}
 
-	@media (max-width: 900px) {
-		html, body {
-			overflow: auto;
+	.site-background img {
+		position: absolute;
+	}
+
+	@media (max-height: 850px) {
+		.site-background {
+			width: 512px;
+			height: 512px;
 		}
 
-		.content-area {
-			overflow-y: auto;
-			margin-top: 60px;
-			padding-top: 10px;
-		}
-
-		.t10-leaderboard-container {
-			padding-bottom: 20px;
+		.site-background img {
+			width: 512px;
+			height: 512px;
 		}
 	}
 </style>
