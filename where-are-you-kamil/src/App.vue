@@ -17,10 +17,12 @@ import TopRankings from './components/TopRankings.vue';
 		background-color: #14161a;
 		width: 100%;
 		height: 100%;
+		overflow-x: hidden;
 	}
 
 	body {
 		margin: 0;
+		overflow-x: hidden;
 	}
 
 	.site-background {
