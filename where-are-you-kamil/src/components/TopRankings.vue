@@ -287,7 +287,6 @@ export default class TopRankings extends Vue {
                 throw new Error(`Failed to fetch leaderboard: HTTP ${leaderboardResponse.status}`);
             }
             const leaderboardData = await leaderboardResponse.json();
-
             this.finalPaceValues = [];
 
             // add calcs here
