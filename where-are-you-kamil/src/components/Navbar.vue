@@ -3,7 +3,7 @@
         <div class="navbar-brand">
             <div class="logo-text">
                 <img src="/KAMIL.png" />
-                <span>where the FUCK is kamil?</span>
+                <span>where is kamil?</span>
             </div>
             <a class="github-container" target="_blank" href="https://github.com/celeseyana/where-are-you-kamil">
                 <i class="fa-brands fa-github"></i>
